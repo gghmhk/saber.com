@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saber表情包 - 骑士王的可爱瞬间</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --gold-primary: #D4AF37;
+            --gold-light: #F4E4BA;
+            --gold-dark: #B8860B;
+            --blue-primary: #1A2B63;
+            --blue-light: #2E4A8C;
+            --blue-dark: #0D1529;
+            --epic-bg: #0A0F1A;
+            --epic-bg-light: #121A2E;
+            --silver: #E6E8F0;
+            --text-primary: #E6E8F0;
+            --text-secondary: #9CA3AF;
+            --text-muted: #6B7280;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', 'PingFang SC', 'Hiragino Sans GB', sans-serif;
+            background: var(--epic-bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+            cursor: none;
+        }
+
+        #custom-cursor {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--gold-primary);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 99999;
+            transition: transform 0.1s ease, opacity 0.3s ease;
+            mix-blend-mode: difference;
+        }
+
+        #custom-cursor::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 4px;
+            height: 4px;
+            background: var(--gold-primary);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        #cursor-trail {
+            position: fixed;
+            pointer-events: none;
+            z-index: 99998;
+        }
+
+        .particle {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: var(--gold-primary);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: particleFade 1.5s ease-out forwards;
+            box-shadow: 0 0 8px var(--gold-primary), 0 0 16px var(--gold-primary);
+        }
+
+        @keyframes particleFade {
+            0% { opacity: 1; transform: scale(1); }
+            100% { opacity: 0; transform: scale(0); }
+        }
+
+        #site-badge {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            padding: 15px 25px;
+            background: rgba(10, 15, 26, 0.8);
+            border: 1px solid var(--gold-primary);
+            backdrop-filter: blur(10px);
+        }
+
+        #site-badge .main-title {
+            font-size: 14px;
+            color: var(--gold-primary);
+            letter-spacing: 3px;
+        }
+
+        #site-badge .sub-title {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 5px;
+        }
+
+        #top-controls {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            gap: 15px;
+        }
+
+        .control-btn {
+            width: 50px;
+            height: 50px;
+            border: 2px solid var(--gold-primary);
+            background: rgba(10, 15, 26, 0.8);
+            color: var(--gold-primary);
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 18px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .control-btn:hover {
+            background: var(--gold-primary);
+            color: var(--epic-bg);
+            transform: scale(1.1);
+            box-shadow: 0 0 30px var(--gold-primary);
+        }
+
+        .sticker-page-header {
+            padding: 120px 40px 60px;
+            text-align: center;
+        }
+
+        .sticker-page-title {
+            font-size: 48px;
+            color: var(--gold-primary);
+            margin-bottom: 15px;
+            letter-spacing: 8px;
+            text-shadow: 0 0 30px rgba(212, 175, 55, 0.5);
+        }
+
+        .sticker-page-subtitle {
+            font-size: 18px;
+            color: var(--text-secondary);
+            letter-spacing: 4px;
+        }
+
+        .sticker-grid-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px 80px;
+        }
+
+        .sticker-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 30px;
+        }
+
+        .sticker-card {
+            background: linear-gradient(135deg, rgba(26, 43, 99, 0.4) 0%, rgba(10, 15, 26, 0.6) 100%);
+            border: 1px solid var(--gold-primary);
+            border-radius: 15px;
+            overflow: hidden;
+            transition: all 0.4s ease;
+            cursor: pointer;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .sticker-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .sticker-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 20px 60px rgba(212, 175, 55, 0.3);
+        }
+
+        .sticker-image-wrapper {
+            width: 100%;
+            padding-top: 100%;
+            position: relative;
+            background: var(--epic-bg-light);
+            overflow: hidden;
+        }
+
+        .sticker-image-wrapper img {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 85%;
+            height: 85%;
+            object-fit: contain;
+            transition: transform 0.3s ease;
+        }
+
+        .sticker-card:hover .sticker-image-wrapper img {
+            transform: translate(-50%, -50%) scale(1.1);
+        }
+
+        .sticker-info {
+            padding: 20px;
+            text-align: center;
+        }
+
+        .sticker-type {
+            display: inline-block;
+            padding: 4px 12px;
+            background: var(--gold-primary);
+            color: var(--epic-bg);
+            font-size: 12px;
+            font-weight: bold;
+            border-radius: 12px;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+        }
+
+        .sticker-name {
+            font-size: 14px;
+            color: var(--text-primary);
+            margin-bottom: 15px;
+        }
+
+        .sticker-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .sticker-action-btn {
+            flex: 1;
+            padding: 10px 15px;
+            border: 1px solid var(--gold-primary);
+            background: transparent;
+            color: var(--gold-primary);
+            font-size: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .sticker-action-btn:hover {
+            background: var(--gold-primary);
+            color: var(--epic-bg);
+        }
+
+        footer {
+            background: var(--epic-bg);
+            padding: 60px 40px;
+            text-align: center;
+            border-top: 1px solid rgba(212, 175, 55, 0.2);
+        }
+
+        .footer-logo {
+            font-size: 24px;
+            color: var(--gold-primary);
+            letter-spacing: 5px;
+            margin-bottom: 20px;
+        }
+
+        .footer-text {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .footer-wsy {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(212, 175, 55, 0.1);
+        }
+
+        .footer-wsy span {
+            color: var(--gold-primary);
+            letter-spacing: 3px;
+        }
+
+        #lightbox {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 100000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        #lightbox.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .lightbox-content {
+            max-width: 90vw;
+            max-height: 85vh;
+            position: relative;
+        }
+
+        .lightbox-content img {
+            max-width: 100%;
+            max-height: 85vh;
+            object-fit: contain;
+            border-radius: 10px;
+            box-shadow: 0 0 60px rgba(212, 175, 55, 0.3);
+        }
+
+        .lightbox-close {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            border: 2px solid var(--gold-primary);
+            background: rgba(10, 15, 26, 0.8);
+            color: var(--gold-primary);
+            border-radius: 50%;
+            font-size: 24px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s ease;
+            z-index: 100001;
+        }
+
+        .lightbox-close:hover {
+            background: var(--gold-primary);
+            color: var(--epic-bg);
+            transform: scale(1.1);
+        }
+
+        .lightbox-download {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 15px 40px;
+            border: 2px solid var(--gold-primary);
+            background: rgba(10, 15, 26, 0.9);
+            color: var(--gold-primary);
+            font-size: 16px;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 100001;
+            letter-spacing: 3px;
+        }
+
+        .lightbox-download:hover {
+            background: var(--gold-primary);
+            color: var(--epic-bg);
+            transform: translateX(-50%) scale(1.05);
+            box-shadow: 0 0 30px rgba(212, 175, 55, 0.5);
+        }
+
+        @media (max-width: 768px) {
+            .sticker-page-title {
+                font-size: 32px;
+                letter-spacing: 4px;
+            }
+
+            .sticker-page-subtitle {
+                font-size: 14px;
+                letter-spacing: 2px;
+            }
+
+            .sticker-grid {
+                grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+                gap: 15px;
+            }
+
+            #site-badge {
+                display: none;
+            }
+
+            .control-btn {
+                width: 44px;
+                height: 44px;
+                font-size: 16px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="custom-cursor"></div>
+    <div id="cursor-trail"></div>
+
+    <div id="site-badge">
+        <div class="main-title">FATE/STAY NIGHT</div>
+        <div class="sub-title">wsy的小站</div>
+    </div>
+
+    <div id="top-controls">
+        <button class="control-btn" id="back-btn" title="返回主站">🏠</button>
+        <button class="control-btn" id="theme-toggle" title="切换主题">🌙</button>
+    </div>
+
+    <header class="sticker-page-header">
+        <h1 class="sticker-page-title">Saber表情包</h1>
+        <p class="sticker-page-subtitle">骑士王的可爱瞬间</p>
+    </header>
+
+    <main class="sticker-grid-container">
+        <div class="sticker-grid" id="sticker-grid">
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-logo">FATE/STAY NIGHT</div>
+        <div class="footer-text">
+            "骑士王的传说，将永远流传下去。"
+        </div>
+        <div class="footer-wsy">
+            <span>wsy的小站</span>
+        </div>
+    </footer>
+
+    <div id="lightbox">
+        <button class="lightbox-close" id="lightbox-close">✕</button>
+        <div class="lightbox-content">
+            <img id="lightbox-image" src="" alt="Saber表情包">
+        </div>
+        <button class="lightbox-download" id="lightbox-download">📥 下载原图</button>
+    </div>
+
+    <script>
+        const stickerData = [
+            {
+                src: "images/0A33B490CFB1B4C8B5120817C2310863.png",
+                name: "Saber表情包 1",
+                type: "PNG"
+            },
+            {
+                src: "images/c5e8ab219f7cda40dd4c5c04c6c4caae.jpg",
+                name: "Saber表情包 2",
+                type: "JPG"
+            },
+            {
+                src: "images/ABED694F617D97DF32A712B928E6221C.jpg",
+                name: "Saber表情包 3",
+                type: "JPG"
+            },
+            {
+                src: "images/87BC5D3B57437095107BE26E524C84D3.gif",
+                name: "Saber动图 1",
+                type: "GIF"
+            },
+            {
+                src: "images/C53CD9294D4244DB828B1A55EAB692D6.gif",
+                name: "Saber动图 2",
+                type: "GIF"
+            },
+            {
+                src: "images/1757339387805-4706b217-b71a-484d-8223-e7d9d827e0b7.png",
+                name: "Saber表情包 4",
+                type: "PNG"
+            }
+        ];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const cursor = document.getElementById('custom-cursor');
+            const cursorTrail = document.getElementById('cursor-trail');
+            let mouseX = 0, mouseY = 0;
+
+            document.addEventListener('mousemove', (e) => {
+                mouseX = e.clientX;
+                mouseY = e.clientY;
+                cursor.style.left = mouseX - 10 + 'px';
+                cursor.style.top = mouseY - 10 + 'px';
+
+                if (Math.random() > 0.35) {
+                    const particle = document.createElement('div');
+                    particle.className = 'particle';
+                    particle.style.left = mouseX + (Math.random() - 0.5) * 10 + 'px';
+                    particle.style.top = mouseY + (Math.random() - 0.5) * 10 + 'px';
+                    const size = 4 + Math.random() * 6;
+                    particle.style.width = size + 'px';
+                    particle.style.height = size + 'px';
+                    cursorTrail.appendChild(particle);
+                    setTimeout(() => particle.remove(), 1500);
+                }
+            });
+
+            document.querySelectorAll('button, .sticker-card, .sticker-action-btn').forEach(el => {
+                if (el) {
+                    el.addEventListener('mouseenter', () => {
+                        cursor.style.transform = 'scale(1.5)';
+                    });
+                    el.addEventListener('mouseleave', () => {
+                        cursor.style.transform = 'scale(1)';
+                    });
+                }
+            });
+
+            if ('ontouchstart' in window) {
+                cursor.style.display = 'none';
+                document.body.style.cursor = 'auto';
+            }
+
+            const stickerGrid = document.getElementById('sticker-grid');
+            stickerData.forEach((sticker, index) => {
+                const card = document.createElement('div');
+                card.className = 'sticker-card';
+                card.style.transitionDelay = (index * 0.1) + 's';
+                card.innerHTML = `
+                    <div class="sticker-image-wrapper">
+                        <img src="${sticker.src}" alt="${sticker.name}" onerror="this.parentElement.innerHTML='<div style=\\'position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:var(--text-muted);\\'>图片加载失败</div>'">
+                    </div>
+                    <div class="sticker-info">
+                        <span class="sticker-type">${sticker.type}</span>
+                        <div class="sticker-name">${sticker.name}</div>
+                        <div class="sticker-actions">
+                            <button class="sticker-action-btn" data-action="preview">🔍 预览</button>
+                            <button class="sticker-action-btn" data-action="download">📥 下载</button>
+                        </div>
+                    </div>
+                `;
+
+                card.querySelector('[data-action="preview"]').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    openLightbox(sticker.src);
+                });
+
+                card.querySelector('[data-action="download"]').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    downloadImage(sticker.src, sticker.name);
+                });
+
+                card.addEventListener('click', () => {
+                    openLightbox(sticker.src);
+                });
+
+                stickerGrid.appendChild(card);
+            });
+
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.1
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('.sticker-card').forEach(card => {
+                observer.observe(card);
+            });
+
+            const lightbox = document.getElementById('lightbox');
+            const lightboxImage = document.getElementById('lightbox-image');
+            const lightboxClose = document.getElementById('lightbox-close');
+            const lightboxDownload = document.getElementById('lightbox-download');
+            let currentImageSrc = '';
+
+            function openLightbox(src) {
+                currentImageSrc = src;
+                lightboxImage.src = src;
+                lightbox.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closeLightbox() {
+                lightbox.classList.remove('active');
+                document.body.style.overflow = '';
+                setTimeout(() => {
+                    if (!lightbox.classList.contains('active')) {
+                        lightbox.style.display = 'none';
+                    }
+                }, 300);
+            }
+
+            lightboxClose.addEventListener('click', closeLightbox);
+            lightbox.addEventListener('click', (e) => {
+                if (e.target === lightbox) {
+                    closeLightbox();
+                }
+            });
+
+            lightboxDownload.addEventListener('click', () => {
+                downloadImage(currentImageSrc, 'saber_sticker');
+            });
+
+            function downloadImage(src, name) {
+                const link = document.createElement('a');
+                link.href = src;
+                link.download = name + '_' + Date.now() + '.' + src.split('.').pop();
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+
+            document.getElementById('back-btn').addEventListener('click', () => {
+                window.close();
+            });
+
+            const themeToggle = document.getElementById('theme-toggle');
+            themeToggle.addEventListener('click', () => {
+                alert('主题切换功能待添加！');
+            });
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && lightbox.classList.contains('active')) {
+                    closeLightbox();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

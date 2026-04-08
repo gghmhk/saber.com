@@ -1,0 +1,1501 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>阿尔托莉雅·潘德拉贡 - 骑士王的宿命与荣光</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --gold-primary: #D4AF37;
+            --gold-light: #F4E4BA;
+            --gold-dark: #B8860B;
+            --blue-primary: #1A2B63;
+            --blue-light: #2E4A8C;
+            --blue-dark: #0D1529;
+            --epic-bg: #0A0F1A;
+            --epic-bg-light: #121A2E;
+            --silver: #E6E8F0;
+            --avalon-green: #2E8B57;
+            --avalon-light: #4CB780;
+            --text-primary: #E6E8F0;
+            --text-secondary: #9CA3AF;
+            --text-muted: #6B7280;
+        }
+
+        .theme-avalon {
+            --gold-primary: #4CB780;
+            --gold-light: #A8E6CF;
+            --gold-dark: #2E8B57;
+            --blue-primary: #1A4A2E;
+            --blue-light: #2E6B4A;
+            --blue-dark: #0D2915;
+            --epic-bg: #0A1A0F;
+            --epic-bg-light: #122E1A;
+            --text-primary: #E6F0E8;
+            --text-secondary: #9CAF9C;
+            --text-muted: #6B726B;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', 'PingFang SC', 'Hiragino Sans GB', sans-serif;
+            background: var(--epic-bg);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            cursor: none;
+        }
+
+        #custom-cursor {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--gold-primary);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 99999;
+            transition: transform 0.1s ease, opacity 0.3s ease;
+            mix-blend-mode: difference;
+        }
+
+        #custom-cursor::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 4px;
+            height: 4px;
+            background: var(--gold-primary);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        #cursor-trail {
+            position: fixed;
+            pointer-events: none;
+            z-index: 99998;
+        }
+
+        .particle {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: var(--gold-primary);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: particleFade 1.5s ease-out forwards;
+            box-shadow: 0 0 8px var(--gold-primary), 0 0 16px var(--gold-primary);
+        }
+
+        @keyframes particleFade {
+            0% { opacity: 1; transform: scale(1); }
+            100% { opacity: 0; transform: scale(0); }
+        }
+
+        #preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--epic-bg);
+            z-index: 100000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 1s ease, visibility 1s ease;
+        }
+
+        #preloader.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .preloader-sword {
+            width: 4px;
+            height: 120px;
+            background: linear-gradient(180deg, var(--gold-light) 0%, var(--gold-primary) 50%, var(--gold-dark) 100%);
+            animation: swordGlow 2s ease-in-out infinite;
+            box-shadow: 0 0 30px var(--gold-primary);
+        }
+
+        @keyframes swordGlow {
+            0%, 100% { box-shadow: 0 0 30px var(--gold-primary); }
+            50% { box-shadow: 0 0 60px var(--gold-primary), 0 0 100px var(--gold-dark); }
+        }
+
+        .preloader-text {
+            margin-top: 30px;
+            font-size: 18px;
+            color: var(--gold-primary);
+            letter-spacing: 8px;
+            animation: textPulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes textPulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        #sidebar-nav {
+            position: fixed;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            margin: 15px 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .nav-dot {
+            width: 12px;
+            height: 12px;
+            border: 2px solid var(--text-muted);
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            background: transparent;
+        }
+
+        .nav-item.active .nav-dot {
+            background: var(--gold-primary);
+            border-color: var(--gold-primary);
+            box-shadow: 0 0 15px var(--gold-primary);
+        }
+
+        .nav-label {
+            margin-left: 15px;
+            color: var(--text-muted);
+            font-size: 12px;
+            white-space: nowrap;
+            opacity: 0;
+            transform: translateX(-20px);
+            transition: all 0.3s ease;
+        }
+
+        .nav-item:hover .nav-label,
+        .nav-item.active .nav-label {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .nav-item:hover .nav-dot {
+            border-color: var(--gold-light);
+        }
+
+        #top-controls {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            gap: 15px;
+        }
+
+        .control-btn {
+            width: 50px;
+            height: 50px;
+            border: 2px solid var(--gold-primary);
+            background: rgba(10, 15, 26, 0.8);
+            color: var(--gold-primary);
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 18px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .control-btn:hover {
+            background: var(--gold-primary);
+            color: var(--epic-bg);
+            transform: scale(1.1);
+            box-shadow: 0 0 30px var(--gold-primary);
+        }
+
+        #site-badge {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            padding: 15px 25px;
+            background: rgba(10, 15, 26, 0.8);
+            border: 1px solid var(--gold-primary);
+            backdrop-filter: blur(10px);
+        }
+
+        #site-badge .main-title {
+            font-size: 14px;
+            color: var(--gold-primary);
+            letter-spacing: 3px;
+        }
+
+        #site-badge .sub-title {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 5px;
+        }
+
+        section {
+            min-height: 100vh;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .section-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .section-bg img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.3;
+            filter: brightness(0.5);
+        }
+
+        .section-bg::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(10, 15, 26, 0.9) 0%, rgba(26, 43, 99, 0.7) 50%, rgba(10, 15, 26, 0.95) 100%);
+        }
+
+        .section-content {
+            position: relative;
+            z-index: 10;
+            max-width: 1200px;
+            padding: 60px 40px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            font-size: 48px;
+            color: var(--gold-primary);
+            margin-bottom: 20px;
+            letter-spacing: 8px;
+            text-align: center;
+            text-shadow: 0 0 30px rgba(212, 175, 55, 0.5);
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 0.8s ease;
+        }
+
+        .section.visible .section-title {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .section-subtitle {
+            font-size: 18px;
+            color: var(--text-secondary);
+            text-align: center;
+            margin-bottom: 60px;
+            letter-spacing: 4px;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease 0.2s;
+        }
+
+        .section.visible .section-subtitle {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        #hero {
+            min-height: 100vh;
+            position: relative;
+        }
+
+        .hero-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+
+        .hero-bg img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.5;
+            filter: brightness(0.6);
+        }
+
+        .hero-bg::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(ellipse at center, transparent 0%, var(--epic-bg) 70%);
+        }
+
+        .hero-bg::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(180deg, transparent 0%, var(--epic-bg) 100%);
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 10;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .hero-title-main {
+            font-size: 72px;
+            color: var(--gold-primary);
+            letter-spacing: 15px;
+            text-shadow: 0 0 50px rgba(212, 175, 55, 0.8), 0 0 100px rgba(212, 175, 55, 0.4);
+            margin-bottom: 20px;
+            animation: heroTitleGlow 3s ease-in-out infinite;
+        }
+
+        @keyframes heroTitleGlow {
+            0%, 100% { text-shadow: 0 0 50px rgba(212, 175, 55, 0.8), 0 0 100px rgba(212, 175, 55, 0.4); }
+            50% { text-shadow: 0 0 80px rgba(212, 175, 55, 1), 0 0 150px rgba(212, 175, 55, 0.6); }
+        }
+
+        .hero-title-sub {
+            font-size: 24px;
+            color: var(--silver);
+            letter-spacing: 10px;
+            margin-bottom: 40px;
+        }
+
+        .hero-quote {
+            font-size: 20px;
+            color: var(--text-secondary);
+            font-style: italic;
+            max-width: 800px;
+            line-height: 1.8;
+            padding: 30px 50px;
+            border-left: 3px solid var(--gold-primary);
+            border-right: 3px solid var(--gold-primary);
+            background: rgba(10, 15, 26, 0.6);
+        }
+
+        .scroll-indicator {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 20;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            animation: scrollBounce 2s ease-in-out infinite;
+        }
+
+        @keyframes scrollBounce {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50% { transform: translateX(-50%) translateY(10px); }
+        }
+
+        .scroll-indicator span {
+            font-size: 12px;
+            color: var(--text-muted);
+            letter-spacing: 3px;
+            margin-bottom: 10px;
+        }
+
+        .scroll-arrow {
+            width: 30px;
+            height: 30px;
+            border-right: 2px solid var(--gold-primary);
+            border-bottom: 2px solid var(--gold-primary);
+            transform: rotate(45deg);
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+
+        .content-text {
+            opacity: 0;
+            transform: translateX(-50px);
+            transition: all 0.8s ease 0.3s;
+        }
+
+        .section.visible .content-text {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .content-image {
+            opacity: 0;
+            transform: translateX(50px);
+            transition: all 0.8s ease 0.3s;
+        }
+
+        .section.visible .content-image {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .content-image img {
+            width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 40px rgba(212, 175, 55, 0.2);
+            border: 1px solid var(--gold-primary);
+        }
+
+        .content-text p {
+            font-size: 16px;
+            line-height: 2;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+
+        .content-text .highlight {
+            color: var(--gold-primary);
+            font-weight: bold;
+        }
+
+        .timeline {
+            position: relative;
+            padding: 40px 0;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(180deg, transparent, var(--gold-primary), transparent);
+            transform: translateX(-50%);
+        }
+
+        .timeline-item {
+            display: flex;
+            justify-content: flex-end;
+            padding: 20px 0;
+            width: 50%;
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 0.8s ease;
+        }
+
+        .timeline-item:nth-child(odd) {
+            align-self: flex-end;
+            justify-content: flex-start;
+            margin-left: 50%;
+            padding-left: 60px;
+        }
+
+        .timeline-item:nth-child(even) {
+            padding-right: 60px;
+            text-align: right;
+        }
+
+        .section.visible .timeline-item {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .timeline-item:nth-child(1) { transition-delay: 0.1s; }
+        .timeline-item:nth-child(2) { transition-delay: 0.2s; }
+        .timeline-item:nth-child(3) { transition-delay: 0.3s; }
+        .timeline-item:nth-child(4) { transition-delay: 0.4s; }
+        .timeline-item:nth-child(5) { transition-delay: 0.5s; }
+        .timeline-item:nth-child(6) { transition-delay: 0.6s; }
+        .timeline-item:nth-child(7) { transition-delay: 0.7s; }
+        .timeline-item:nth-child(8) { transition-delay: 0.8s; }
+
+        .timeline-dot {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: var(--epic-bg);
+            border: 3px solid var(--gold-primary);
+            border-radius: 50%;
+            left: 50%;
+            transform: translateX(-50%);
+            box-shadow: 0 0 20px var(--gold-primary);
+        }
+
+        .timeline-content {
+            background: rgba(26, 43, 99, 0.3);
+            border: 1px solid var(--gold-primary);
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 500px;
+            transition: all 0.3s ease;
+        }
+
+        .timeline-content:hover {
+            background: rgba(212, 175, 55, 0.1);
+            transform: scale(1.02);
+            box-shadow: 0 10px 40px rgba(212, 175, 55, 0.2);
+        }
+
+        .timeline-year {
+            font-size: 24px;
+            color: var(--gold-primary);
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .timeline-title {
+            font-size: 18px;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+        }
+
+        .timeline-desc {
+            font-size: 14px;
+            color: var(--text-muted);
+            line-height: 1.8;
+        }
+
+        .noble-phantasm-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .noble-card {
+            background: linear-gradient(135deg, rgba(26, 43, 99, 0.4) 0%, rgba(10, 15, 26, 0.6) 100%);
+            border: 1px solid var(--gold-primary);
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 0.6s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .noble-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(212, 175, 55, 0.1), transparent);
+            transform: rotate(45deg);
+            transition: all 0.5s ease;
+            opacity: 0;
+        }
+
+        .noble-card:hover::before {
+            animation: shimmer 1s ease;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%) rotate(45deg); opacity: 1; }
+            100% { transform: translateX(100%) rotate(45deg); opacity: 1; }
+        }
+
+        .section.visible .noble-card {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .noble-card:nth-child(1) { transition-delay: 0.1s; }
+        .noble-card:nth-child(2) { transition-delay: 0.2s; }
+        .noble-card:nth-child(3) { transition-delay: 0.3s; }
+
+        .noble-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 60px rgba(212, 175, 55, 0.3);
+        }
+
+        .noble-rank {
+            display: inline-block;
+            padding: 5px 20px;
+            background: var(--gold-primary);
+            color: var(--epic-bg);
+            font-weight: bold;
+            border-radius: 20px;
+            margin-bottom: 20px;
+            letter-spacing: 3px;
+        }
+
+        .noble-name {
+            font-size: 24px;
+            color: var(--gold-primary);
+            margin-bottom: 15px;
+        }
+
+        .noble-name-en {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+            letter-spacing: 2px;
+        }
+
+        .noble-desc {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.8;
+        }
+
+        .quote-wall {
+            display: grid;
+            gap: 30px;
+        }
+
+        .quote-item {
+            background: linear-gradient(90deg, rgba(212, 175, 55, 0.1) 0%, transparent 100%);
+            border-left: 4px solid var(--gold-primary);
+            padding: 30px 40px;
+            opacity: 0;
+            transform: translateX(-50px);
+            transition: all 0.6s ease;
+        }
+
+        .section.visible .quote-item {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .quote-item:nth-child(1) { transition-delay: 0.1s; }
+        .quote-item:nth-child(2) { transition-delay: 0.2s; }
+        .quote-item:nth-child(3) { transition-delay: 0.3s; }
+        .quote-item:nth-child(4) { transition-delay: 0.4s; }
+        .quote-item:nth-child(5) { transition-delay: 0.5s; }
+
+        .quote-text {
+            font-size: 20px;
+            color: var(--text-primary);
+            font-style: italic;
+            line-height: 1.8;
+            margin-bottom: 15px;
+        }
+
+        .quote-author {
+            font-size: 14px;
+            color: var(--gold-primary);
+            letter-spacing: 2px;
+        }
+
+        .knight-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .knight-card {
+            background: rgba(26, 43, 99, 0.3);
+            border: 1px solid var(--text-muted);
+            border-radius: 10px;
+            padding: 30px 20px;
+            text-align: center;
+            opacity: 0;
+            transform: scale(0.8);
+            transition: all 0.4s ease;
+        }
+
+        .section.visible .knight-card {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .knight-card:nth-child(1) { transition-delay: 0.05s; }
+        .knight-card:nth-child(2) { transition-delay: 0.1s; }
+        .knight-card:nth-child(3) { transition-delay: 0.15s; }
+        .knight-card:nth-child(4) { transition-delay: 0.2s; }
+        .knight-card:nth-child(5) { transition-delay: 0.25s; }
+        .knight-card:nth-child(6) { transition-delay: 0.3s; }
+        .knight-card:nth-child(7) { transition-delay: 0.35s; }
+        .knight-card:nth-child(8) { transition-delay: 0.4s; }
+        .knight-card:nth-child(9) { transition-delay: 0.45s; }
+        .knight-card:nth-child(10) { transition-delay: 0.5s; }
+        .knight-card:nth-child(11) { transition-delay: 0.55s; }
+        .knight-card:nth-child(12) { transition-delay: 0.6s; }
+
+        .knight-card:hover {
+            border-color: var(--gold-primary);
+            background: rgba(212, 175, 55, 0.1);
+            transform: scale(1.05);
+        }
+
+        .knight-name {
+            font-size: 16px;
+            color: var(--text-primary);
+            margin-bottom: 5px;
+        }
+
+        .knight-title {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        #ending {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .ending-bg img {
+            opacity: 0.4;
+        }
+
+        .ending-title {
+            font-size: 48px;
+            color: var(--avalon-green);
+            letter-spacing: 10px;
+            margin-bottom: 30px;
+            text-shadow: 0 0 50px rgba(76, 183, 128, 0.8);
+        }
+
+        .ending-quote {
+            font-size: 24px;
+            color: var(--text-secondary);
+            font-style: italic;
+            max-width: 800px;
+            line-height: 2;
+            margin-bottom: 40px;
+        }
+
+        .ending-avalon {
+            font-size: 60px;
+            color: var(--avalon-light);
+            letter-spacing: 20px;
+            animation: avalonGlow 3s ease-in-out infinite;
+        }
+
+        @keyframes avalonGlow {
+            0%, 100% { text-shadow: 0 0 30px rgba(76, 183, 128, 0.5); }
+            50% { text-shadow: 0 0 60px rgba(76, 183, 128, 1), 0 0 100px rgba(76, 183, 128, 0.5); }
+        }
+
+        footer {
+            background: var(--epic-bg);
+            padding: 60px 40px;
+            text-align: center;
+            border-top: 1px solid rgba(212, 175, 55, 0.2);
+        }
+
+        .footer-logo {
+            font-size: 24px;
+            color: var(--gold-primary);
+            letter-spacing: 5px;
+            margin-bottom: 20px;
+        }
+
+        .footer-text {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .footer-wsy {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(212, 175, 55, 0.1);
+        }
+
+        .footer-wsy span {
+            color: var(--gold-primary);
+            letter-spacing: 3px;
+        }
+
+        .image-download-btn {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            background: rgba(10, 15, 26, 0.8);
+            border: 1px solid var(--gold-primary);
+            color: var(--gold-primary);
+            font-size: 12px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            z-index: 20;
+        }
+
+        .image-download-btn:hover {
+            background: var(--gold-primary);
+            color: var(--epic-bg);
+        }
+
+        .image-wrapper {
+            position: relative;
+        }
+
+        @media (max-width: 1024px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+
+            .content-text,
+            .content-image {
+                transform: translateY(50px);
+            }
+
+            .section.visible .content-text,
+            .section.visible .content-image {
+                transform: translateY(0);
+            }
+
+            .timeline::before {
+                left: 20px;
+            }
+
+            .timeline-item,
+            .timeline-item:nth-child(odd),
+            .timeline-item:nth-child(even) {
+                width: 100%;
+                margin-left: 0;
+                padding-left: 60px;
+                padding-right: 20px;
+                text-align: left;
+                justify-content: flex-start;
+            }
+
+            .timeline-dot {
+                left: 20px;
+            }
+
+            #sidebar-nav {
+                display: none;
+            }
+
+            .hero-title-main {
+                font-size: 36px;
+                letter-spacing: 8px;
+            }
+
+            .hero-title-sub {
+                font-size: 16px;
+                letter-spacing: 5px;
+            }
+
+            .section-title {
+                font-size: 32px;
+                letter-spacing: 5px;
+            }
+
+            #site-badge {
+                display: none;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="preloader">
+        <div class="preloader-sword"></div>
+        <div class="preloader-text">宣誓</div>
+    </div>
+
+    <div id="custom-cursor"></div>
+    <div id="cursor-trail"></div>
+
+    <div id="site-badge">
+        <div class="main-title">FATE/STAY NIGHT</div>
+        <div class="sub-title">wsy的小站</div>
+    </div>
+
+    <nav id="sidebar-nav">
+        <div class="nav-item active" data-section="hero">
+            <div class="nav-dot"></div>
+            <span class="nav-label">序章</span>
+        </div>
+        <div class="nav-item" data-section="birth">
+            <div class="nav-dot"></div>
+            <span class="nav-label">宿命降生</span>
+        </div>
+        <div class="nav-item" data-section="coronation">
+            <div class="nav-dot"></div>
+            <span class="nav-label">石中剑加冕</span>
+        </div>
+        <div class="nav-item" data-section="knights">
+            <div class="nav-dot"></div>
+            <span class="nav-label">圆桌骑士</span>
+        </div>
+        <div class="nav-item" data-section="battle">
+            <div class="nav-dot"></div>
+            <span class="nav-label">卡姆兰之役</span>
+        </div>
+        <div class="nav-item" data-section="holy-grail">
+            <div class="nav-dot"></div>
+            <span class="nav-label">圣杯战争</span>
+        </div>
+        <div class="nav-item" data-section="noble-phantasm">
+            <div class="nav-dot"></div>
+            <span class="nav-label">宝具殿堂</span>
+        </div>
+        <div class="nav-item" data-section="quotes">
+            <div class="nav-dot"></div>
+            <span class="nav-label">经典语录</span>
+        </div>
+        <div class="nav-item" data-section="ending">
+            <div class="nav-dot"></div>
+            <span class="nav-label">理想乡</span>
+        </div>
+    </nav>
+
+    <audio id="bgm" loop>
+        <source src="audio/bgm.mp3" type="audio/mpeg">
+    </audio>
+
+    <div id="top-controls">
+        <button class="control-btn" id="theme-toggle" title="切换主题">🌙</button>
+        <button class="control-btn" id="music-toggle" title="背景音乐">🔇</button>
+        <button class="control-btn" id="sticker-btn" title="Saber表情包">😊</button>
+        <button class="control-btn" id="back-to-top" title="返回顶部">⬆</button>
+    </div>
+
+    <section id="hero" class="section">
+        <div class="hero-bg">
+            <img src="images/IMG_20260408_142237.jpg" alt="阿尔托莉雅 - 骑士王" onerror="this.style.display='none'">
+        </div>
+        <div class="hero-content">
+            <h1 class="hero-title-main">阿尔托莉雅·潘德拉贡</h1>
+            <h2 class="hero-title-sub">骑士王的宿命与荣光</h2>
+            <div class="hero-quote">
+                "吾身乃剑所天成。<br>
+                身为骑士，守护王国是我的职责。<br>
+                哪怕这宿命是悲剧，我也会以剑，以这个身躯去面对。"
+            </div>
+        </div>
+        <div class="scroll-indicator">
+            <span>SCROLL TO EXPLORE</span>
+            <div class="scroll-arrow"></div>
+        </div>
+    </section>
+
+    <section id="birth" class="section">
+        <div class="section-bg">
+            <img src="images/IMG_20260408_142151.jpg" alt="宿命序章" onerror="this.style.display='none'">
+        </div>
+        <div class="section-content">
+            <h2 class="section-title">第一章：宿命降生</h2>
+            <p class="section-subtitle">尤瑟王血脉与梅林预言</p>
+            <div class="content-grid">
+                <div class="content-text">
+                    <p>
+                        <span class="highlight">阿尔托莉雅·潘德拉贡</span>，不列颠王国尤瑟王的女儿。
+                        由于当时王位继承纷争不断，她被魔术师<span class="highlight">梅林</span>带走，在远离宫廷的地方秘密抚养长大。
+                    </p>
+                    <p>
+                        梅林曾预言：<span class="highlight">"这个孩子将成为不列颠的王。"</span>
+                        但这份荣耀的背后，是沉重的宿命——拔出石中剑者，将不再是人类。
+                    </p>
+                    <p>
+                        从小被当作男孩养大，学习剑术、兵法、为王之道。
+                        她的童年没有欢笑，只有成为合格君王的无尽训练。
+                    </p>
+                </div>
+                <div class="content-image image-wrapper">
+                    <img src="images/IMG_20260408_142151.jpg" alt="宿命降生" onerror="this.style.display='none'">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="coronation" class="section">
+        <div class="section-bg">
+            <img src="images/IMG_20260408_142207.jpg" alt="石中剑加冕" onerror="this.style.display='none'">
+        </div>
+        <div class="section-content">
+            <h2 class="section-title">第二章：石中剑加冕</h2>
+            <p class="section-subtitle">王者的诞生与圆桌骑士的建立</p>
+            <div class="content-grid">
+                <div class="content-image image-wrapper">
+                    <img src="images/IMG_20260408_142207.jpg" alt="石中剑加冕" onerror="this.style.display='none'">
+                </div>
+                <div class="content-text">
+                    <p>
+                        尤瑟王去世后，不列颠陷入内乱。
+                        按照古老传统，谁能拔出插在石头中的<span class="highlight">选定之剑</span>，谁就是真正的国王。
+                    </p>
+                    <p>
+                        在众人都失败后，年轻的阿尔托莉雅走上前，轻易地拔出了那把剑。
+                        那一刻，她不再是普通的少女，而是<span class="highlight">不列颠的王</span>。
+                    </p>
+                    <p>
+                        加冕之后，她建立了<span class="highlight">圆桌骑士团</span>——
+                        不分高低贵贱，所有骑士平等围坐，共同为不列颠的和平而战。
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="knights" class="section">
+        <div class="section-bg">
+            <div style="width:100%;height:100%;background:linear-gradient(135deg,var(--epic-bg) 0%,var(--blue-dark) 100%);"></div>
+        </div>
+        <div class="section-content">
+            <h2 class="section-title">第三章：圆桌羁绊</h2>
+            <p class="section-subtitle">与骑士们共同守护王国的岁月</p>
+            <div class="knight-grid">
+                <div class="knight-card">
+                    <div class="knight-name">阿尔托莉雅</div>
+                    <div class="knight-title">骑士王 / 圆桌之主</div>
+                </div>
+                <div class="knight-card">
+                    <div class="knight-name">兰斯洛特</div>
+                    <div class="knight-title">湖中骑士 / 最强骑士</div>
+                </div>
+                <div class="knight-card">
+                    <div class="knight-name">高文</div>
+                    <div class="knight-title">太阳骑士 / 白马王子</div>
+                </div>
+                <div class="knight-card">
+                    <div class="knight-name">崔斯坦</div>
+                    <div class="knight-title">悲伤之子</div>
+                </div>
+                <div class="knight-card">
+                    <div class="knight-name">莫德雷德</div>
+                    <div class="knight-title">叛逆之骑士</div>
+                </div>
+                <div class="knight-card">
+                    <div class="knight-name">贝狄威尔</div>
+                    <div class="knight-title">最后的骑士</div>
+                </div>
+                <div class="knight-card">
+                    <div class="knight-name">加拉哈德</div>
+                    <div class="knight-title">纯洁之骑士</div>
+                </div>
+                <div class="knight-card">
+                    <div class="knight-name">凯</div>
+                    <div class="knight-title">掌膳骑士</div>
+                </div>
+                <div class="knight-card">
+                    <div class="knight-name">阿格规文</div>
+                    <div class="knight-title">铁之阿格规文</div>
+                </div>
+                <div class="knight-card">
+                    <div class="knight-name">加雷斯</div>
+                    <div class="knight-title">美掌公</div>
+                </div>
+                <div class="knight-card">
+                    <div class="knight-name">加荷里斯</div>
+                    <div class="knight-title">高文之弟</div>
+                </div>
+                <div class="knight-card">
+                    <div class="knight-name">帕西瓦尔</div>
+                    <div class="knight-title">圣杯探求者</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="battle" class="section">
+        <div class="section-bg">
+            <img src="images/IMG_20260408_142223.jpg" alt="卡姆兰之役" onerror="this.style.display='none'">
+        </div>
+        <div class="section-content">
+            <h2 class="section-title">第四章：不列颠落幕</h2>
+            <p class="section-subtitle">卡姆兰之役与王国的终结</p>
+            <div class="content-grid">
+                <div class="content-text">
+                    <p>
+                        平静的岁月没有持续太久。
+                        <span class="highlight">莫德雷德</span>——阿尔托莉雅的姐姐摩根勒菲的孩子，举起了反旗。
+                    </p>
+                    <p>
+                        在<span class="highlight">卡姆兰平原</span>，最后的决战开始了。
+                        曾经并肩作战的骑士们，如今刀剑相向。
+                        昔日的圆桌，已经四分五裂。
+                    </p>
+                    <p>
+                        在战斗的最后，阿尔托莉雅用圣枪刺穿了莫德雷德，
+                        但自己也受到了致命一击。
+                        不列颠的传说，在此刻迎来了终焉。
+                    </p>
+                    <p>
+                        最后，她将<span class="highlight">Excalibur</span>交予贝狄威尔，
+                        让他归还于湖中仙女。
+                        然后，在永恒的安眠中，等待着圣杯的召唤。
+                    </p>
+                </div>
+                <div class="content-image image-wrapper">
+                    <img src="images/IMG_20260408_142223.jpg" alt="卡姆兰之役" onerror="this.style.display='none'">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="holy-grail" class="section">
+        <div class="section-bg">
+            <div style="width:100%;height:100%;background:linear-gradient(135deg,var(--blue-dark) 0%,var(--epic-bg) 100%);"></div>
+        </div>
+        <div class="section-content">
+            <h2 class="section-title">第五章：圣杯战争</h2>
+            <p class="section-subtitle">第四次与第五次的命运轮回</p>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-year">1990年代</div>
+                        <div class="timeline-title">第四次圣杯战争</div>
+                        <div class="timeline-desc">
+                            被卫宫切嗣以Saber职阶召唤。
+                            为了"拯救不列颠"的夙愿而战，
+                            却在最后被令咒逼迫，破坏了圣杯。
+                        </div>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-year">2004年</div>
+                        <div class="timeline-title">第五次圣杯战争 - Fate线</div>
+                        <div class="timeline-desc">
+                            被卫宫士郎召唤，
+                            在漫长的并肩作战中，
+                            终于理解了"正义的伙伴"的真正含义。
+                            最后，她放下了执念，在朝阳中微笑着逝去。
+                        </div>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-year">2004年</div>
+                        <div class="timeline-title">第五次圣杯战争 - UBW线</div>
+                        <div class="timeline-desc">
+                            与远坂凛结盟，
+                            在无限剑制的世界中，
+                            见证了士郎与吉尔伽美什的决战。
+                            最后，她选择留在现世，成为了某人的守护骑士。
+                        </div>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-year">2004年</div>
+                        <div class="timeline-title">第五次圣杯战争 - HF线</div>
+                        <div class="timeline-desc">
+                            被黑影吞噬，化作Alter。
+                            在黑暗中，与士郎作最后的告别。
+                            即使被污染，她的骑士道也从未改变。
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="noble-phantasm" class="section">
+        <div class="section-bg">
+            <img src="images/IMG_20260331_143720.jpg" alt="宝具殿堂" onerror="this.style.display='none'">
+        </div>
+        <div class="section-content">
+            <h2 class="section-title">第六章：宝具殿堂</h2>
+            <p class="section-subtitle">誓约胜利之剑与核心宝具</p>
+            <div class="noble-phantasm-grid">
+                <div class="noble-card">
+                    <div class="noble-rank">A++</div>
+                    <div class="noble-name">誓约胜利之剑</div>
+                    <div class="noble-name-en">Excalibur</div>
+                    <div class="noble-desc">
+                        光之剑。星球锻造的神造兵器。
+                        将持有者的魔力转换为"光"，
+                        压缩·加速·收束，
+                        击出疑似恒星内部能量的断层。
+                    </div>
+                </div>
+                <div class="noble-card">
+                    <div class="noble-rank">A++</div>
+                    <div class="noble-name">遗世独立的理想乡</div>
+                    <div class="noble-name-en">Avalon</div>
+                    <div class="noble-desc">
+                        Excalibur的剑鞘。
+                        持有者不会衰老，伤患会快速治愈。
+                        解放真名后，会展开为保护持有者的"结界"，
+                        屏蔽所有干涉，连魔法也无法触及。
+                    </div>
+                </div>
+                <div class="noble-card">
+                    <div class="noble-rank">A++</div>
+                    <div class="noble-name">风王结界</div>
+                    <div class="noble-name-en">Invisible Air</div>
+                    <div class="noble-desc">
+                        缠绕Excalibur的风之结界。
+                        通过扭曲光线来隐藏剑身，
+                        让敌人无法正确判断剑的距离。
+                        也可以作为一次性的投射武器解放。
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="quotes" class="section">
+        <div class="section-bg">
+            <div style="width:100%;height:100%;background:linear-gradient(135deg,var(--epic-bg) 0%,var(--blue-primary) 100%);"></div>
+        </div>
+        <div class="section-content">
+            <h2 class="section-title">第七章：经典语录</h2>
+            <p class="section-subtitle">贯穿全系列的名台词</p>
+            <div class="quote-wall">
+                <div class="quote-item">
+                    <div class="quote-text">
+                        "吾身乃剑所天成。"
+                    </div>
+                    <div class="quote-author">—— 阿尔托莉雅·潘德拉贡</div>
+                </div>
+                <div class="quote-item">
+                    <div class="quote-text">
+                        "身为王，就必须比任何人都强，比任何人都背负更多。"
+                    </div>
+                    <div class="quote-author">—— 阿尔托莉雅·潘德拉贡</div>
+                </div>
+                <div class="quote-item">
+                    <div class="quote-text">
+                        "Excalibur——！"
+                    </div>
+                    <div class="quote-author">—— 阿尔托莉雅·潘德拉贡</div>
+                </div>
+                <div class="quote-item">
+                    <div class="quote-text">
+                        "也许我确实不是一个好国王。但是，我是一个称职的国王。"
+                    </div>
+                    <div class="quote-author">—— 阿尔托莉雅·潘德拉贡</div>
+                </div>
+                <div class="quote-item">
+                    <div class="quote-text">
+                        "士郎，谢谢你。我终于，明白了自己想要的是什么。"
+                    </div>
+                    <div class="quote-author">—— 阿尔托莉雅·潘德拉贡</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="ending" class="section">
+        <div class="section-bg ending-bg">
+            <img src="images/IMG_20260408_142254.jpg" alt="理想乡" onerror="this.style.display='none'">
+        </div>
+        <div class="section-content">
+            <h2 class="ending-title">终章：理想乡</h2>
+            <div class="ending-quote">
+                "漫长的战斗终于结束了。<br>
+                放下了剑，放下了王的责任，<br>
+                她终于可以作为一个普通的少女，<br>
+                在永恒的安息中，等待着与那个人的重逢。"
+            </div>
+            <div class="ending-avalon">AVALON</div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="footer-logo">FATE/STAY NIGHT</div>
+        <div class="footer-text">
+            "骑士王的传说，将永远流传下去。"
+        </div>
+        <div class="footer-wsy">
+            <span>wsy的小站</span>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                document.getElementById('preloader').classList.add('hidden');
+            }, 2500);
+
+            const cursor = document.getElementById('custom-cursor');
+            const cursorTrail = document.getElementById('cursor-trail');
+            let mouseX = 0, mouseY = 0;
+
+            document.addEventListener('mousemove', (e) => {
+                mouseX = e.clientX;
+                mouseY = e.clientY;
+                cursor.style.left = mouseX - 10 + 'px';
+                cursor.style.top = mouseY - 10 + 'px';
+
+                if (Math.random() > 0.35) {
+                    const particle = document.createElement('div');
+                    particle.className = 'particle';
+                    particle.style.left = mouseX + (Math.random() - 0.5) * 10 + 'px';
+                    particle.style.top = mouseY + (Math.random() - 0.5) * 10 + 'px';
+                    const size = 4 + Math.random() * 6;
+                    particle.style.width = size + 'px';
+                    particle.style.height = size + 'px';
+                    cursorTrail.appendChild(particle);
+                    setTimeout(() => particle.remove(), 1500);
+                }
+            });
+
+            document.querySelectorAll('a, button, .nav-item, .noble-card, .knight-card').forEach(el => {
+                el.addEventListener('mouseenter', () => {
+                    cursor.style.transform = 'scale(1.5)';
+                });
+                el.addEventListener('mouseleave', () => {
+                    cursor.style.transform = 'scale(1)';
+                });
+            });
+
+            if ('ontouchstart' in window) {
+                cursor.style.display = 'none';
+                document.body.style.cursor = 'auto';
+            }
+
+            const sections = document.querySelectorAll('.section');
+            const navItems = document.querySelectorAll('.nav-item');
+
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.3
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+
+                        const sectionId = entry.target.id;
+                        navItems.forEach(item => {
+                            item.classList.remove('active');
+                            if (item.dataset.section === sectionId) {
+                                item.classList.add('active');
+                            }
+                        });
+                    }
+                });
+            }, observerOptions);
+
+            sections.forEach(section => observer.observe(section));
+
+            navItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    const targetId = item.dataset.section;
+                    const targetSection = document.getElementById(targetId);
+                    if (targetSection) {
+                        targetSection.scrollIntoView({ behavior: 'smooth' });
+                    }
+                });
+            });
+
+            const themeToggle = document.getElementById('theme-toggle');
+            themeToggle.addEventListener('click', () => {
+                document.body.classList.toggle('theme-avalon');
+                themeToggle.textContent = document.body.classList.contains('theme-avalon') ? '⚔️' : '🌙';
+            });
+
+            const backToTop = document.getElementById('back-to-top');
+            backToTop.addEventListener('click', () => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+
+            window.addEventListener('scroll', () => {
+                backToTop.style.opacity = window.scrollY > 500 ? '1' : '0';
+            });
+
+            const stickerBtn = document.getElementById('sticker-btn');
+            stickerBtn.addEventListener('click', () => {
+                window.open('saber_stickers.html', '_blank');
+            });
+
+            const bgm = document.getElementById('bgm');
+            const musicToggle = document.getElementById('music-toggle');
+            let isPlaying = false;
+
+            musicToggle.addEventListener('click', () => {
+                if (isPlaying) {
+                    bgm.pause();
+                    musicToggle.textContent = '🔇';
+                    musicToggle.title = '播放背景音乐';
+                } else {
+                    bgm.play().catch(e => {
+                        console.log('需要用户交互才能播放音频:', e);
+                        alert('请先点击页面任意位置，然后再点击音乐按钮播放！');
+                    });
+                    musicToggle.textContent = '🔊';
+                    musicToggle.title = '暂停背景音乐';
+                }
+                isPlaying = !isPlaying;
+            });
+
+            document.addEventListener('click', function initAudio() {
+                if (!isPlaying) {
+                    bgm.play().then(() => {
+                        isPlaying = true;
+                        musicToggle.textContent = '🔊';
+                        musicToggle.title = '暂停背景音乐';
+                    }).catch(() => {
+                    });
+                }
+                document.removeEventListener('click', initAudio);
+            }, { once: true });
+
+            const heroSection = document.getElementById('hero');
+            const heroBg = heroSection.querySelector('.hero-bg img');
+
+            window.addEventListener('scroll', () => {
+                const scrolled = window.scrollY;
+                if (heroBg) {
+                    heroBg.style.transform = `translateY(${scrolled * 0.3}px)`;
+                }
+            });
+
+            console.log('%c⚔️ 阿尔托莉雅·潘德拉贡 - 骑士王的宿命与荣光', 'color: #D4AF37; font-size: 20px; font-weight: bold;');
+            console.log('%cwsy的小站', 'color: #E6E8F0; font-size: 12px;');
+        });
+    </script>
+</body>
+</html>
